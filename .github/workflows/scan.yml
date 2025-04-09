@@ -1,0 +1,53 @@
+name: Scan
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  Scan_Fortify:
+    runs-on: self-hosted
+    env:
+      FORTIFY_BUILD: ${{ secrets.FORTIFY_BUILD }}
+      FORTIFY_VERID: ${{ secrets.FORTIFY_VERID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Env
+        run: |
+          python -m venv venv
+          .\venv\Scripts\Activate.ps1
+          pip install -r requirements.txt
+          pip list
+        shell: powershell
+
+      - name: Run Fortify Translation
+        run: |
+          sourceanalyzer -b $env:FORTIFY_BUILD -clean
+          sourceanalyzer -b $env:FORTIFY_BUILD `
+            -python-version 3 `
+            -python-path "venv\Lib\site-packages" `
+            -django-template-dirs "challenge\templates;introduction\templates" `
+            -exclude "venv\**" `
+            "."
+        shell: powershell
+
+      - name: Run Fortify Scan
+        run: |
+          scancentral -url $env:FORTIFY_SC_URL approve `
+            -versionid $env:FORTIFY_VERID `
+            -uptoken $env:FORTIFY_TOKEN `
+            -b $env:FORTIFY_BUILD `
+            -scan
+        env:
+          FORTIFY_TOKEN: ${{ secrets.FORTIFY_TOKEN }}
+          FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
+        shell: powershell
+
+      - name: Approve Artifact
+        run: | 
+          $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id' 
+          fcli ssc artifact approve $artifactId
+        shell: powershell
