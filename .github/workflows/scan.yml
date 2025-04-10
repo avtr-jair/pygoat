@@ -62,7 +62,7 @@ jobs:
 
       - name: Approve Artifact
         run: | 
-          Wrtie-Host "Approving Artifact token: $env:FORTIFY_JOB_TOKEN"  
+          Write-Host "Approving Artifact token: $env:FORTIFY_JOB_TOKEN"  
 
           fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
           fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
