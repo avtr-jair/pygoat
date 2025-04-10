@@ -41,7 +41,7 @@ jobs:
             -versionid $env:FORTIFY_VERID `
             -uptoken $env:FORTIFY_TOKEN `
             -b $env:FORTIFY_BUILD `
-            -scan
+            -scan | Out-String
 
           Write-Host "Fortify Scan Output: $output"
 
