@@ -55,22 +55,21 @@ jobs:
           }
 
           Write-Host "Token extraido: $token"
-          
-          echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_OUTPUT
+          echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
         env:
           FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
         shell: powershell
 
       - name: Approve Artifact
         run: | 
-          Write-Host "Approving Artifact token: ${{steps.var.outputs.FORTIFY_JOB_TOKEN}}"  
+          Write-Host "Approving Artifact token: ${{env.FORTIFY_JOB_TOKEN}}"  
 
           fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
           fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
           
           fcli sc-sast session login --ssc-url $env:FORTIFY_SSC_URL -t $env:FORTIFY_TOKEN -c $env:FORTIFY_CLIENT_AUTH_TOKEN --connect-timeout 30s
           
-          fcli sc-sast scan wait-for ${{steps.var.outputs.FORTIFY_JOB_TOKEN}}
+          fcli sc-sast scan wait-for ${{env.FORTIFY_JOB_TOKEN}}
 
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id' 
           fcli ssc artifact approve $artifactId
