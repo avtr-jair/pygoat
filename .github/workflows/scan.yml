@@ -78,5 +78,4 @@ jobs:
           FORTIFY_SSC_USER: ${{ secrets.FORTIFY_SSC_USER }}
           FORTIFY_SSC_PASS: ${{ secrets.FORTIFY_SSC_PASS }}
           FORTIFY_CLIENT_AUTH_TOKEN: ${{ secrets.FORTIFY_CLIENT_AUTH_TOKEN }}
-          FORTIFY_JOB_TOKEN: ${{ env.FORTIFY_JOB_TOKEN }}
         shell: powershell
