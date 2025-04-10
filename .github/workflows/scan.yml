@@ -53,7 +53,7 @@ jobs:
               $token = "No token found"
           }
 
-          Write-Host "Token: $token"
+          Write-Host "Token extraido: $token"
           
           echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
         env:
@@ -62,6 +62,8 @@ jobs:
 
       - name: Approve Artifact
         run: | 
+          Wrtie-Host "Approving Artifact token: $env:FORTIFY_JOB_TOKEN"  
+
           fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
           fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
           
@@ -76,4 +78,5 @@ jobs:
           FORTIFY_SSC_USER: ${{ secrets.FORTIFY_SSC_USER }}
           FORTIFY_SSC_PASS: ${{ secrets.FORTIFY_SSC_PASS }}
           FORTIFY_CLIENT_AUTH_TOKEN: ${{ secrets.FORTIFY_CLIENT_AUTH_TOKEN }}
+          FORTIFY_JOB_TOKEN: ${{ env.FORTIFY_JOB_TOKEN }}
         shell: powershell
