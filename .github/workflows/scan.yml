@@ -43,8 +43,11 @@ jobs:
             -b $env:FORTIFY_BUILD `
             -scan
 
+          Write-Host "Fortify Scan Output: $output"
+
           $token = ($output | Select-String -Pattern "Submitted job and received token: (\S+)" | ForEach-Object { $_.Matches.Groups[1].Value })
-          echo "Fortify Scan Output: $token"
+          
+          Write-Host "Fortify Job Token: $token"
           
           echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
         env:
