@@ -36,7 +36,7 @@ jobs:
 
       - name: Run Fortify Scan
         run: |
-          scancentral -url $env:FORTIFY_SC_URL approve `
+          scancentral -url $env:FORTIFY_SC_URL start -upload `
             -versionid $env:FORTIFY_VERID `
             -uptoken $env:FORTIFY_TOKEN `
             -b $env:FORTIFY_BUILD `
@@ -48,6 +48,8 @@ jobs:
 
       - name: Approve Artifact
         run: | 
+          fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
+          fcli ssc session login --url https://win-8rtak254evs:8443/ssc --user admin --password Avattar.2023
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id' 
           fcli ssc artifact approve $artifactId
         shell: powershell
