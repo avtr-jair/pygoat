@@ -45,9 +45,14 @@ jobs:
 
           Write-Host "Fortify Scan Output: $output"
 
-          $token = ($output | Select-String -Pattern "Submitted job and received token: (\S+)" | ForEach-Object { $_.Matches.Groups[1].Value })
-          
-          Write-Host "Fortify Job Token: $token"
+          # Usar -match para extraer el token
+          if ($output -match "Submitted job and received token:\s*(\S+)") {
+              $token = $matches[1]
+          } else {
+              $token = "No token found"
+          }
+
+          Write-Host "Token: $token"
           
           echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
         env:
