@@ -48,6 +48,7 @@ jobs:
 
       - name: Approve Artifact
         run: | 
+          fcli ssc session login --url https://win-8rtak254evs:8443/ssc --user admin --password Avattar.2023
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id' 
           fcli ssc artifact approve $artifactId
         shell: powershell
