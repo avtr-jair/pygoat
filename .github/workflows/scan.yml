@@ -44,6 +44,8 @@ jobs:
             -scan
 
           $token = ($output | Select-String -Pattern "Submitted job and received token: (\S+)" | ForEach-Object { $_.Matches.Groups[1].Value })
+          echo "Fortify Scan Output: $token"
+          
           echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
         env:
           FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
