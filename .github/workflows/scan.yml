@@ -26,11 +26,12 @@ jobs:
 
       - name: Run Fortify Translation
         run: |
+          .\venv\Scripts\Activate.ps1
           sourceanalyzer -b $env:FORTIFY_BUILD -clean
           sourceanalyzer -b $env:FORTIFY_BUILD `
             -python-version 3 `
-            -python-path "venv\Lib\site-packages" `
-            -django-template-dirs "challenge\templates;introduction\templates" `
+            -python-path "C:\actions-runner\_work\pygoat\pygoat\venv\Lib\site-packages" `
+            -django-template-dirs "C:\actions-runner\_work\pygoat\pygoat\challenge\templates;C:\actions-runner\_work\pygoat\pygoat\introduction\templates" `
             -exclude "venv\**" `
             "."
         shell: powershell
@@ -55,6 +56,8 @@ jobs:
           Write-Host "Token: $token"
           
           echo "FORTIFY_JOB_TOKEN=$token" >> $GITHUB_ENV
+
+          Write-Host ${{ env.FORTIFY_JOB_TOKEN }}
         env:
           FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
         shell: powershell
@@ -66,6 +69,8 @@ jobs:
           
           fcli sc-sast session login --ssc-url $env:FORTIFY_SSC_URL -t $env:FORTIFY_TOKEN -c $env:FORTIFY_CLIENT_AUTH_TOKEN --connect-timeout 30s
           
+          fcli sc-sast scan wait-for ${{ env.FORTIFY_JOB_TOKEN }}
+
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id' 
           fcli ssc artifact approve $artifactId
         env:
