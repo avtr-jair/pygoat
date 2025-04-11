@@ -2,7 +2,7 @@ name: Scan
 
 on:
   push:
-    branches: [ main ]
+    #branches: [ main ]
 
 jobs:
   Scan_Fortify:
