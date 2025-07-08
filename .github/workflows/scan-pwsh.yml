@@ -1,6 +1,6 @@
 name: Scan
 
-on:
+on:  
   workflow_dispatch: {}
   #push:
     #branches: [ main ]
@@ -23,7 +23,7 @@ jobs:
           .\venv\Scripts\Activate.ps1
           pip install -r requirements.txt
           pip list
-        shell: powershell
+        shell: pwsh
 
       - name: Run Fortify Translation
         run: |
@@ -35,7 +35,7 @@ jobs:
             -django-template-dirs "C:\actions-runner\_work\pygoat\pygoat\challenge\templates;C:\actions-runner\_work\pygoat\pygoat\introduction\templates" `
             -django-disable-autodiscover -exclude "**\venv\**\*.*" `
             "."
-        shell: powershell
+        shell: pwsh
 
       - name: Run Fortify Scan
         id: var
@@ -59,44 +59,24 @@ jobs:
           echo "FORTIFY_JOB_TOKEN=$token" >> $env:GITHUB_ENV
         env:
           FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
-        shell: powershell
+        shell: pwsh
 
       - name: Approve Artifact
-        run: | 
-          Write-Host "Approving Artifact token: ${{env.FORTIFY_JOB_TOKEN}}"  
+        run: |
+          Write-Host "Approving Artifact token: ${{env.FORTIFY_JOB_TOKEN}}"
 
           fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
           fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
-          
+
           fcli sc-sast session login --ssc-url $env:FORTIFY_SSC_URL -t $env:FORTIFY_TOKEN -c $env:FORTIFY_CLIENT_AUTH_TOKEN --connect-timeout 30s
-          
+
           fcli sc-sast scan wait-for $env:FORTIFY_JOB_TOKEN
 
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id'
-          
-          echo "ARTIFACT_ID=$artifactId" >> $env:GITHUB_ENV
-          
           fcli ssc artifact approve $artifactId
         env:
           FORTIFY_SSC_URL: ${{ secrets.FORTIFY_SSC_URL }}
           FORTIFY_SSC_USER: ${{ secrets.FORTIFY_SSC_USER }}
           FORTIFY_SSC_PASS: ${{ secrets.FORTIFY_SSC_PASS }}
           FORTIFY_CLIENT_AUTH_TOKEN: ${{ secrets.FORTIFY_CLIENT_AUTH_TOKEN }}
-        shell: powershell
-
-      - name: Download Fortify Report
-        run: |
-          Write-Host "Downloading Fortify Report for Artifact ID: ${{env.ARTIFACT_ID}}"
-          fcli sc-sast report download ${{env.ARTIFACT_ID}} -f ${{secrets.FORTIFY_BUILD}}.fpr
-          
-      - name: Translate FPR to Serif 2.1.0
-        run: |
-          Write-Host "Translating FPR to Serif 2.1.0 format"
-          sarif convert ${{secrets.FORTIFY_BUILD}}.fpr --tool FortifyFpr --output ${{secrets.FORTIFY_BUILD}}.fpr.sarif --pretty-print --force
-
-      - name: Upload SARIF File
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
-          category: Fortify
-          
+        shell: pwsh
