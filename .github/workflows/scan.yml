@@ -1,7 +1,13 @@
 name: Scan
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      do-translation:
+        description: 'Run Fortify translation step'
+        type: boolean
+        default: false
+
   #push:
     #branches: [ main ]
 
@@ -38,7 +44,7 @@ jobs:
         shell: powershell
 
       - name: Run Fortify Scan
-        id: var
+        if: ${{ github.event.inputs.do-translation == 'true' }}
         run: |
           $output = scancentral -url $env:FORTIFY_SC_URL start -upload `
             -versionid $env:FORTIFY_VERID `
@@ -94,6 +100,11 @@ jobs:
         with:
           name: fortify-fpr
           path: ${{secrets.FORTIFY_BUILD}}.fpr
+
+      - name: Install Parser
+        run: |
+          Write-Host "Installing SARIF Parser"
+          dotnet tool install --global Sarif.Multitool --version 2.2.2
 
       - name: Translate FPR to Serif 2.1.0
         run: |
