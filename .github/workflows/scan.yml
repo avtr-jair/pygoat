@@ -87,12 +87,24 @@ jobs:
       - name: Download Fortify Report
         run: |
           Write-Host "Downloading Fortify Report for Artifact ID: ${{env.ARTIFACT_ID}}"
-          fcli sc-sast report download ${{env.ARTIFACT_ID}} -f ${{secrets.FORTIFY_BUILD}}.fpr
+          fcli ssc artifact download ${{env.ARTIFACT_ID}} -f ${{secrets.FORTIFY_BUILD}}.fpr
           
+      - name: Upload FPR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fortify-fpr
+          path: ${{secrets.FORTIFY_BUILD}}.fpr
+
       - name: Translate FPR to Serif 2.1.0
         run: |
           Write-Host "Translating FPR to Serif 2.1.0 format"
           sarif convert ${{secrets.FORTIFY_BUILD}}.fpr --tool FortifyFpr --output ${{secrets.FORTIFY_BUILD}}.fpr.sarif --pretty-print --force
+        
+      - name: Upload Sarif Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fortify-fpr-sarif
+          path: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
 
       - name: Upload SARIF File
         uses: github/codeql-action/upload-sarif@v3
