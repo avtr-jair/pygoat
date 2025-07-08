@@ -1,4 +1,4 @@
-name: Scan
+name: Scan-powershell
 
 on:
   workflow_dispatch:
@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Env
+        if: ${{ github.event.inputs.do-translation == 'true' }}
         run: |
           python -m venv venv
           .\venv\Scripts\Activate.ps1
@@ -45,6 +46,7 @@ jobs:
         shell: powershell
 
       - name: Run Fortify Scan
+        if: ${{ github.event.inputs.do-translation == 'true' }}
         run: |
           $output = scancentral -url $env:FORTIFY_SC_URL start -upload `
             -versionid $env:FORTIFY_VERID `
@@ -68,6 +70,7 @@ jobs:
         shell: powershell
 
       - name: Approve Artifact
+        if: ${{ github.event.inputs.do-translation == 'true' }}
         run: | 
           Write-Host "Approving Artifact token: ${{env.FORTIFY_JOB_TOKEN}}"  
 
@@ -92,8 +95,8 @@ jobs:
 
       - name: Download Fortify Report
         run: |
-          Write-Host "Downloading Fortify Report for Artifact ID: ${{env.ARTIFACT_ID}}"
-          fcli ssc artifact download ${{env.ARTIFACT_ID}} -f ${{secrets.FORTIFY_BUILD}}.fpr
+          Write-Host "Downloading Fortify Report for Artifact ID: 3182"
+          fcli ssc artifact download 3182 -f ${{secrets.FORTIFY_BUILD}}.fpr
           
       - name: Upload FPR Artifact
         uses: actions/upload-artifact@v4
