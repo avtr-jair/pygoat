@@ -1,6 +1,7 @@
 name: Debricked scan
 
-on: [push]
+on: 
+  workflow_dispatch: {}
 
 jobs:
   vulnerabilities-scan:

@@ -1,7 +1,8 @@
 name: Scan
 
 on:
-  push:
+  workflow_dispatch: {}
+  #push:
     #branches: [ main ]
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
             -python-version 3 `
             -python-path "C:\actions-runner\_work\pygoat\pygoat\venv\Lib\site-packages" `
             -django-template-dirs "C:\actions-runner\_work\pygoat\pygoat\challenge\templates;C:\actions-runner\_work\pygoat\pygoat\introduction\templates" `
-            -exclude "venv\**" `
+            -django-disable-autodiscover -exclude "**\venv\**\*.*" `
             "."
         shell: powershell
 

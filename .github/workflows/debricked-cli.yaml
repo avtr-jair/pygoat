@@ -1,0 +1,32 @@
+name: Debricked CLI scan
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  debricked: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List files in workspace (para verificar)
+        run: ls -la $GITHUB_WORKSPACE
+
+      - name: Install Debricked CLI
+        run: |
+          curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
+      
+      - name: Run Debricked CLI scan
+        run: |
+          # Administrar permisos de ejecución
+          chmod +x debricked
+          # Run the scan
+          ./debricked scan ./dev -t ${{ secrets.DEBRICKED_TOKEN }} -e "*/node-modules/**" -r Ejemplo --sbom "CycloneDX" --sbom-output "./debricked-sbom.json"
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: debricked-sbom
+          path: ./debricked-sbom.json
