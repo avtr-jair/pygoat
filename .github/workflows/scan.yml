@@ -114,15 +114,20 @@ jobs:
           Write-Host "Translating FPR to Serif 2.1.0 format"
           sarif convert ${{secrets.FORTIFY_BUILD}}.fpr --tool FortifyFpr --output ${{secrets.FORTIFY_BUILD}}.fpr.sarif --pretty-print --force
         
+      - name: Correct Sarif File
+        run: |
+          Write-Host "Correcting SARIF file"
+          jq '(.tool.driver.rules[] | select(.guid | test("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$") | not)) | .guid = (.guid | .[0:35]) | .id = (.id | .[0:35])' ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif 
+
       - name: Upload Sarif Artifact
         uses: actions/upload-artifact@v4
         with:
           name: fortify-fpr-sarif
-          path: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
+          path: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
 
       - name: Upload SARIF File
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
+          sarif_file: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
           category: Fortify
           
