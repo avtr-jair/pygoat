@@ -68,17 +68,26 @@ jobs:
         env:
           FORTIFY_SC_URL: ${{ secrets.FORTIFY_SC_URL }}
         shell: powershell
+      
+      - name: LogIn Fortify SSC and SC-SAST
+        run: |
+          Write-Host "Logging in to Fortify SSC and SC-SAST"
+          fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
+          fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
+          
+          fcli sc-sast session login --ssc-url $env:FORTIFY_SSC_URL -t $env:FORTIFY_TOKEN -c $env:FORTIFY_CLIENT_AUTH_TOKEN --connect-timeout 30s
+        env:
+          FORTIFY_SSC_URL: ${{ secrets.FORTIFY_SSC_URL }}
+          FORTIFY_SSC_USER: ${{ secrets.FORTIFY_SSC_USER }}
+          FORTIFY_SSC_PASS: ${{ secrets.FORTIFY_SSC_PASS }}
+          FORTIFY_CLIENT_AUTH_TOKEN: ${{ secrets.FORTIFY_CLIENT_AUTH_TOKEN }}
+        shell: powershell
 
       - name: Approve Artifact
         if: ${{ github.event.inputs.do-translation == 'true' }}
         run: | 
           Write-Host "Approving Artifact token: ${{env.FORTIFY_JOB_TOKEN}}"  
 
-          fcli config truststore set -f="C:\Program Files\Java\jdk-23\lib\security\cacerts"
-          fcli ssc session login --url $env:FORTIFY_SSC_URL --user $env:FORTIFY_SSC_USER --password $env:FORTIFY_SSC_PASS
-          
-          fcli sc-sast session login --ssc-url $env:FORTIFY_SSC_URL -t $env:FORTIFY_TOKEN -c $env:FORTIFY_CLIENT_AUTH_TOKEN --connect-timeout 30s
-          
           fcli sc-sast scan wait-for $env:FORTIFY_JOB_TOKEN
 
           $artifactId = fcli ssc artifact list --av=$env:FORTIFY_VERID --output=json | jq -r '.[0].id'
@@ -87,9 +96,6 @@ jobs:
           
           fcli ssc artifact approve $artifactId
         env:
-          FORTIFY_SSC_URL: ${{ secrets.FORTIFY_SSC_URL }}
-          FORTIFY_SSC_USER: ${{ secrets.FORTIFY_SSC_USER }}
-          FORTIFY_SSC_PASS: ${{ secrets.FORTIFY_SSC_PASS }}
           FORTIFY_CLIENT_AUTH_TOKEN: ${{ secrets.FORTIFY_CLIENT_AUTH_TOKEN }}
         shell: powershell
 
