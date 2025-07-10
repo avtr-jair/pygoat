@@ -19,12 +19,16 @@ jobs:
       FORTIFY_VERID: ${{ secrets.FORTIFY_VERID }}
       FORTIFY_TOKEN: ${{ secrets.FORTIFY_TOKEN }}
 
+    permissions:
+      contents: read
+      security-events: write
+
     steps:
       - name: Mark workspace as safe for Git
         shell: powershell
         run: |
           git config --global --add safe.directory "${{ github.workspace }}"
-          
+
       - name: Checkout code
         uses: actions/checkout@v2
 
