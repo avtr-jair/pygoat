@@ -17,12 +17,13 @@ walk(
   else .
   end
 )
-|
-.runs[].results |= map(
-  .codeFlows |= (
-    map(
-      .threadFlows |= (map(select(.locations | length > 0)))
+| .runs[].results |= map(
+    .codeFlows |= (
+      map(
+        # En cada codeFlow, quitamos los threadFlows con locations vacías
+        .threadFlows |= (map(select(.locations | length > 0)))
+        # Y solo mantenemos los codeFlows que sigan teniendo al menos un threadFlow
       | select(.threadFlows | length > 0)
+      )
     )
   )
-)
