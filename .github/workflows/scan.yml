@@ -141,7 +141,7 @@ jobs:
             end
           )
           '@ ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
-        shell: powershell
+        shell: pwsh
         
       - name: Upload Sarif Artifact
         uses: actions/upload-artifact@v4
