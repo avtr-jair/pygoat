@@ -17,3 +17,12 @@ walk(
   else .
   end
 )
+|
+.runs[].results |= map(
+  .codeFlows |= (
+    map(
+      .threadFlows |= (map(select(.locations | length > 0)))
+      | select(.threadFlows | length > 0)
+    )
+  )
+)
