@@ -138,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fortify-fpr-sarif
-          path: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
+          path: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
 
       #- name: Upload SARIF File
       #  uses: github/codeql-action/upload-sarif@v3
