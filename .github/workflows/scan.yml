@@ -129,10 +129,10 @@ jobs:
           Write-Host "Translating FPR to Serif 2.1.0 format"
           sarif convert ${{secrets.FORTIFY_BUILD}}.fpr --tool FortifyFpr --output ${{secrets.FORTIFY_BUILD}}.fpr.sarif --pretty-print --force
         
-      #- name: Correct Sarif File
-      #  run: |
-      #    jq -f .\test.jq ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
-      #  shell: pwsh
+      - name: Correct Sarif File
+        run: |
+          jq -f .\test.jq ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
+        shell: pwsh
         
       - name: Upload Sarif Artifact
         uses: actions/upload-artifact@v4
