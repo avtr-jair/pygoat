@@ -134,15 +134,15 @@ jobs:
       #    jq -f .\test.jq ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
       #  shell: pwsh
         
-      #- name: Upload Sarif Artifact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: fortify-fpr-sarif
-      #    path: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
-
-      - name: Upload SARIF File
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Sarif Artifact
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
-          category: Fortify
+          name: fortify-fpr-sarif
+          path: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
+
+      #- name: Upload SARIF File
+      #  uses: github/codeql-action/upload-sarif@v3
+      #  with:
+      #    sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
+      #    category: Fortify
           
