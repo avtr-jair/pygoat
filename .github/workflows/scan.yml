@@ -140,9 +140,9 @@ jobs:
           name: fortify-fpr-sarif
           path: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
 
-      #- name: Upload SARIF File
-      #  uses: github/codeql-action/upload-sarif@v3
-      #  with:
-      #    sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
-      #    category: Fortify
+      - name: Upload SARIF File
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
+          category: Fortify
           
