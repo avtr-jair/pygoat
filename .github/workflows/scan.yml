@@ -119,30 +119,19 @@ jobs:
           name: fortify-fpr
           path: ${{secrets.FORTIFY_BUILD}}.fpr
 
-      #- name: Install Parser
-        #run: |
-          #Write-Host "Installing SARIF Parser"
-          #dotnet tool install --global Sarif.Multitool --version 2.2.2
-
-      - name: Translate FPR to Serif 2.1.0
+      - name: Run Github-SAST-Report
         run: |
-          Write-Host "Translating FPR to Serif 2.1.0 format"
-          sarif convert ${{secrets.FORTIFY_BUILD}}.fpr --tool FortifyFpr --output ${{secrets.FORTIFY_BUILD}}.fpr.sarif --pretty-print --force
-        
-      - name: Correct Sarif File
-        run: |
-          jq -f .\test.jq ${{secrets.FORTIFY_BUILD}}.fpr.sarif > ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
-        shell: pwsh
+          fcli ssc action run github-sast-report --appversion $env:FORTIFY_VERID --file ${{secrets.FORTIFY_BUILD}}.fpr.sarif
         
       - name: Upload Sarif Artifact
         uses: actions/upload-artifact@v4
         with:
           name: fortify-fpr-sarif
-          path: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
+          path: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
 
       - name: Upload SARIF File
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{secrets.FORTIFY_BUILD}}-corrected.fpr.sarif
+          sarif_file: ${{secrets.FORTIFY_BUILD}}.fpr.sarif
           category: Fortify
           
